@@ -1,0 +1,12 @@
+# Compiled files
+*.o
+*.obj
+*.exe
+*.out
+
+# Build directories
+build/
+bin/
+
+# MacOS system files
+.DS_Store
