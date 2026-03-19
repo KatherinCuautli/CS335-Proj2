@@ -141,8 +141,8 @@ bool Inventory<Comparator, std::unordered_set<Item>>::discard(
     if(iter == items_.end()){ //item not found in items_
         return false;
     } 
-    weight_ -= itr->weight_;
-    items_.erase(itr);
+    weight_ -= iter->weight_;
+    items_.erase(iter);
     return true;
 }
 
@@ -158,7 +158,7 @@ bool Inventory<Comparator, std::unordered_set<Item>>::contains(
 {
     //creating a temp Item object
     auto iter = items_.find(Item{itemName,0});
-    return it != items.end(); //return result of operation
+    return iter != items_.end(); //return result of operation
     
     /*
     Does the same as above:
