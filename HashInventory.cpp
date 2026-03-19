@@ -9,10 +9,11 @@
  * @tparam Comparator The comparison class for querying items
  */
 template <class Comparator>
-Inventory<Comparator, std::unordered_set<Item>>::Inventory()
-{
-    // your code here
-}
+Inventory<Comparator, std::unordered_set<Item>>::Inventory() : 
+    items_(),
+    equipped_(nullptr),
+    weight_(0.0)
+{}
 
 /**
  * @brief Retrieves the value stored in `equipped_`
@@ -21,7 +22,7 @@ Inventory<Comparator, std::unordered_set<Item>>::Inventory()
 template <class Comparator>
 Item* Inventory<Comparator, std::unordered_set<Item>>::getEquipped() const
 {
-    // your code here
+    return equipped_;
 }
 
 /**
@@ -33,7 +34,7 @@ Item* Inventory<Comparator, std::unordered_set<Item>>::getEquipped() const
 template <class Comparator>
 void Inventory<Comparator, std::unordered_set<Item>>::equip(Item* itemToEquip)
 {
-    // your code here
+    equipped_ = itemToEquip; //without deallocaiting the original ...
 }
 
 /**
@@ -44,7 +45,10 @@ void Inventory<Comparator, std::unordered_set<Item>>::equip(Item* itemToEquip)
 template <class Comparator>
 void Inventory<Comparator, std::unordered_set<Item>>::discardEquipped()
 {
-    // your code here
+    if(equipped_ != nullptr){
+        delete equipped_;
+        equipped_ = nullptr;
+    }
 }
 
 /**
@@ -54,7 +58,7 @@ void Inventory<Comparator, std::unordered_set<Item>>::discardEquipped()
 template <class Comparator>
 float Inventory<Comparator, std::unordered_set<Item>>::getWeight() const
 {
-    // your code here
+    return weight_;
 }
 
 /**
@@ -64,7 +68,7 @@ template <class Comparator>
 size_t
 Inventory<Comparator, std::unordered_set<Item>>::size() const
 {
-    // your code here
+    return items_.size();
 }
 
 /**
@@ -76,7 +80,16 @@ template <class Comparator>
 std::unordered_set<Item>
 Inventory<Comparator, std::unordered_set<Item>>::getItems() const
 {
-    // your code here
+    std::unordered_set<Item> copy(items_); //initialized with items_ container 
+    return copy;
+    //can just do return items_ ? why? T*****T
+
+    //essentially what the copy constructor is doing w/above initialization
+    /* 
+        for(auto x : items_){
+            copy.insert(x); 
+        }
+    */
 }
 
 /**
@@ -90,7 +103,25 @@ Inventory<Comparator, std::unordered_set<Item>>::getItems() const
 template <class Comparator>
 bool Inventory<Comparator, std::unordered_set<Item>>::pickup(const Item& target)
 {
-    // your code here
+    //O(1) operation: 
+    auto iter = items_.find(target);
+    if(iter != items_.end()){
+        return false; //iterator didn't reach the end because it found a match
+    }
+
+    if((items_.insert(target)).second){ //insert() returns a pair<iterator, bool>
+        weight_ += target.weight_;
+        return true;
+    };
+
+    /* 
+    Results in O(n) cost:
+    for(auto x : items_){
+        if(target.name_ == x.name_){ //when is good use case for comparator class? T*****T
+            return false;
+        }
+    }
+    */
 }
 
 /**
@@ -105,7 +136,14 @@ template <class Comparator>
 bool Inventory<Comparator, std::unordered_set<Item>>::discard(
     const std::string& itemName)
 {
-    // your code here
+    // Why I cant just use contains() member function?? T*******T
+    auto iter = items_.find(Item{itemName, 0}); //only name matters here
+    if(iter == items_.end()){ //item not found in items_
+        return false;
+    } 
+    weight_ -= itr->weight_;
+    items_.erase(itr);
+    return true;
 }
 
 /**
@@ -118,7 +156,17 @@ template <class Comparator>
 bool Inventory<Comparator, std::unordered_set<Item>>::contains(
     const std::string& itemName) const
 {
-    // your code here
+    //creating a temp Item object
+    auto iter = items_.find(Item{itemName,0});
+    return it != items.end(); //return result of operation
+    
+    /*
+    Does the same as above:
+    if(iter != items.end()){ //item found in items_
+        return true;
+    }
+    return false;
+    */
 }
 
 /**
@@ -143,7 +191,7 @@ std::unordered_set<Item>
 Inventory<Comparator, std::unordered_set<Item>>::query(const Item& start,
     const Item& end) const
 {
-    // your code here
+    //STUB FUNCTION
 }
 
 /**
@@ -153,5 +201,8 @@ Inventory<Comparator, std::unordered_set<Item>>::query(const Item& start,
 template <class Comparator>
 Inventory<Comparator, std::unordered_set<Item>>::~Inventory()
 {
-    // your code here
+    if(equipped_ != nullptr){
+        delete equipped_;
+        equipped_ = nullptr;
+    }
 }
