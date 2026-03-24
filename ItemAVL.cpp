@@ -142,7 +142,9 @@ ItemAVL<Comparator>::~ItemAVL()
 template <class Comparator>
 bool ItemAVL<Comparator>::contains(const std::string& target) const
 {
-    // Your code here
+    return contains(target, root_); 
+    //will call the private mem. function that will actually do the work (wrapper)
+
 }
 
 /**
@@ -155,7 +157,16 @@ bool ItemAVL<Comparator>::contains(const std::string& target) const
 template <class Comparator>
 bool ItemAVL<Comparator>::contains(const std::string& target, const Node* subroot) const
 {
-    // Your code here.
+    if(subroot == nullptr){
+        return false;
+    }
+
+    if(subroot->value_.name_ == target){ //checks if item is already in AVL tree
+        return true;
+    }
+
+    return contains(target, subroot->left_) || contains(target, subroot->right_); 
+    //recursively calls itself, returning true if found in left or right subtree
 }
 
 /**
