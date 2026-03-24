@@ -149,13 +149,35 @@ bool Inventory<Comparator, Tree>::contains(const std::string& itemName) const
 template <class Comparator>
 std::unordered_set<Item> Inventory<Comparator, Tree>::query(const Item& start, const Item& end) const
 {
-    // Your code here.
+    if(Comparator::lessThan(end, start)){ //range is not possible
+        return {};
+    }
+
+    std::unordered_set<Item> result; //create a new set that will contain our range after calling the helper private function
+    queryHelper(start, end, items_.root(), result); //calling helper, passing the root node of our AVL tree as the start of the traversal
+    return result;
 }
 
 template <class Comparator>
 void Inventory<Comparator, Tree>::queryHelper(const Item& start, const Item& end, const Node* root, std::unordered_set<Item>& result) const
 {
-    // Your code here.
+    if(root == nullptr){ //reached end of traversal or tree is empty
+        return; //exit the function
+    }
+
+    const Item& current = root->value_; //item stored in the current node as we traverse
+    //use leq to account for inclusivity
+    if(Comparator::leq(start, current)){ //must keep traversing left subtree, as there might be items part of the range
+        queryHelper(start, end, root->left_, result);
+    }
+
+    if(Comparator::leq(start, current) && Comparator::leq(current, end)){
+        result.insert(current); //inserting to the resulting set if current node falls within our range
+    }
+
+    if(Comparator::leq(current, end)){ //since the current node is less than the end, must keep traversing right subtree until its not
+        queryHelper(start, end, root->right_, result);
+    }
 }
 
 /**
