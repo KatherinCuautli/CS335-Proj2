@@ -191,7 +191,17 @@ std::unordered_set<Item>
 Inventory<Comparator, std::unordered_set<Item>>::query(const Item& start,
     const Item& end) const
 {
-    //STUB FUNCTION
+    if(Comparator::lessThan(end, start)){
+        return {}; //an empty set
+    }
+
+    std::unordered_set<Item> mySet;
+    for(const auto& item : items_){
+        if(!Comparator::lessThan(item, start) && Comparator::leq(item, end)){
+            mySet.insert(item);
+        }
+    }
+    return mySet;
 }
 
 /**
